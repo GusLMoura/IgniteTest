@@ -29,7 +29,7 @@ public:
 	TSubclassOf<class APathfindBox> PathFindBoxClass;
 
 	UPROPERTY(EditAnywhere, Category = "Grid Properties")
-	int32 SizeX = 20;
+	int32 SizeX = 15;
 
 	UPROPERTY(EditAnywhere, Category = "Grid Properties")
 	int32 SizeY = 9;
@@ -77,5 +77,4 @@ private:
 	int32 CalculateGCost(APathfindBox* AnyBox, APathfindBox* DestinationBox);
 	TArray<APathfindBox*> GetPathfindBoxNeighbours(APathfindBox* AnyBox);
 	TArray<APathfindBox*> GetFinalPathToDestination(APathfindBox* DestinationBox);
-
 };

@@ -36,17 +36,79 @@ void APathfindGrid::InitializePathfindBoxesPenaltyTMap()
 {
 	TypesOfPathFindBoxPenalty.Add(EPathfindBoxType::EPBT_Grass, 1.f);
 	TypesOfPathFindBoxPenalty.Add(EPathfindBoxType::EPBT_Sand, 1.5f);
-	TypesOfPathFindBoxPenalty.Add(EPathfindBoxType::EPBT_Mud, 2.f);
+	TypesOfPathFindBoxPenalty.Add(EPathfindBoxType::EPBT_Mud, 5.f);
 }
 
 void APathfindGrid::InitializePathfindBoxesTypesLocation()
 {
-	UnWalkableBoxes.Add(FVector2D(0,0));
-	UnWalkableBoxes.Add(FVector2D(0,1));
-	UnWalkableBoxes.Add(FVector2D(1,1));
+	//This function is hardcoded and is not safe we safe (we could overflow the grid limits by accident) 
+	//TODO: Replaced this function for a solution on Unreal Editor 
+
+	//Set Unwalkable Boxes Position on Grid
+	UnWalkableBoxes.Add(FVector2D(0, 0));
+	UnWalkableBoxes.Add(FVector2D(0, 1));
+	UnWalkableBoxes.Add(FVector2D(0, 2));
+	UnWalkableBoxes.Add(FVector2D(0, 3));
+	UnWalkableBoxes.Add(FVector2D(0, 5));
+	UnWalkableBoxes.Add(FVector2D(0, 6));
+	UnWalkableBoxes.Add(FVector2D(0, 7));
+	UnWalkableBoxes.Add(FVector2D(0, 8));
+	UnWalkableBoxes.Add(FVector2D(1, 0));
+	UnWalkableBoxes.Add(FVector2D(1, 1));
+	UnWalkableBoxes.Add(FVector2D(1, 2));
+	UnWalkableBoxes.Add(FVector2D(1, 3));
+	UnWalkableBoxes.Add(FVector2D(1, 5));
+	UnWalkableBoxes.Add(FVector2D(1, 6));
+	UnWalkableBoxes.Add(FVector2D(1, 7));
+	UnWalkableBoxes.Add(FVector2D(1, 8));
+	UnWalkableBoxes.Add(FVector2D(3, 1));
+	UnWalkableBoxes.Add(FVector2D(3, 2));
+	UnWalkableBoxes.Add(FVector2D(3, 3));
+	UnWalkableBoxes.Add(FVector2D(3, 4));
+	UnWalkableBoxes.Add(FVector2D(3, 5));
+	UnWalkableBoxes.Add(FVector2D(3, 6));
+	UnWalkableBoxes.Add(FVector2D(3, 7));
+	UnWalkableBoxes.Add(FVector2D(4, 4));
+	UnWalkableBoxes.Add(FVector2D(5, 4));
+	UnWalkableBoxes.Add(FVector2D(6, 4));
+	UnWalkableBoxes.Add(FVector2D(7, 4));
+	UnWalkableBoxes.Add(FVector2D(8, 4));
+	UnWalkableBoxes.Add(FVector2D(9, 4));
+	UnWalkableBoxes.Add(FVector2D(9, 5));
+	UnWalkableBoxes.Add(FVector2D(9, 6));
+	UnWalkableBoxes.Add(FVector2D(9, 7));
+	UnWalkableBoxes.Add(FVector2D(9, 8));
+
+	//Set Sand Boxes Position On Grid
+	SandBoxes.Add(FVector2D(7, 0));
+	SandBoxes.Add(FVector2D(7, 1));
+	SandBoxes.Add(FVector2D(7, 7));
+	SandBoxes.Add(FVector2D(8, 0));
+	SandBoxes.Add(FVector2D(8, 1));
+	SandBoxes.Add(FVector2D(8, 7));
+	SandBoxes.Add(FVector2D(13, 0));
+	SandBoxes.Add(FVector2D(13, 1));
+	SandBoxes.Add(FVector2D(14, 0));
+	SandBoxes.Add(FVector2D(14, 1));
+
+	//Set Mud Boxes Position On Grid
+	MudBoxes.Add(FVector2D(7, 2));
+	MudBoxes.Add(FVector2D(7, 3));
+	MudBoxes.Add(FVector2D(7, 5));
+	MudBoxes.Add(FVector2D(7, 6));
+	MudBoxes.Add(FVector2D(8, 2));
+	MudBoxes.Add(FVector2D(8, 3));
+	MudBoxes.Add(FVector2D(10, 4));
+	MudBoxes.Add(FVector2D(10, 5));
+	MudBoxes.Add(FVector2D(11, 4));
+	MudBoxes.Add(FVector2D(11, 5));
+	MudBoxes.Add(FVector2D(12, 4));
+	MudBoxes.Add(FVector2D(12, 5));
+	MudBoxes.Add(FVector2D(13, 4));
+	MudBoxes.Add(FVector2D(13, 5));
+	MudBoxes.Add(FVector2D(14, 4));
+	MudBoxes.Add(FVector2D(14, 5));
 }
-
-
 
 void APathfindGrid::SetGridOriginAndInclination()
 {
@@ -237,7 +299,6 @@ TArray<APathfindBox*> APathfindGrid::AStarFindPathToDestination(APathfindBox* St
 			}
 		}
 	}
-
 	//We could not Find a Path to Destination
 	return TArray<APathfindBox*>();
 }
@@ -253,8 +314,7 @@ int32 APathfindGrid::CalculateHCost(APathfindBox* AnyBox, APathfindBox* Destinat
 
 int32 APathfindGrid::CalculateGCost(APathfindBox* AnyBox, APathfindBox* DestinationBox)
 {
-	//float PathFindBoxTerrainPenalty = *TypesOfPathFindBoxPenalty.Find(DestinationBox->GetPathfindBoxType());
-	float PathFindBoxTerrainPenalty = 1.0f;
+	float PathFindBoxTerrainPenalty = *TypesOfPathFindBoxPenalty.Find(DestinationBox->GetPathfindBoxType());
 
 	int32 XDistance = FMath::Abs(AnyBox->GetPosX() - DestinationBox->GetPosX());
 	int32 YDistance = FMath::Abs(AnyBox->GetPosY() - DestinationBox->GetPosY());
