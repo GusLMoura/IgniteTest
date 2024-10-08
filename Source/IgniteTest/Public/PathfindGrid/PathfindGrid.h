@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "PathfindGrid.generated.h"
 
+enum class EPathfindBoxType : uint8;
+
 UCLASS()
 class IGNITETEST_API APathfindGrid : public AActor
 {
@@ -47,11 +49,29 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Grid Properties")
 	FVector2D CharacterInitialBox = FVector2D(0.f, 4.f);
 
-	void MoveCharacterToBoxPosition(FVector BoxPosition);
+	void MoveCharacterToPathfindBox(APathfindBox* DestinationBox);
+
+	APathfindBox* GetPlathfindBoxAtPosition(int32 PositionX, int32 PositionY);
+
+	TArray<APathfindBox*> AStarFindPathToDestination(APathfindBox* StartBox, APathfindBox* DestinationBox);
+
+	
 
 private:
-	TArray<APathfindBox*> Boxes;
+	TArray<TArray<APathfindBox*>> Boxes;
+	TMap<EPathfindBoxType, float> TypesOfPathFindBoxPenalty;
+	
+	void InitializePathfindBoxesPenaltyTMap();
 	void SetGridOriginAndInclination();
 	void CreateGrid();
 	void CreateCharacter();
+
+	const int32 MOVE_STRAIGHT_CONST = 10;
+	const int32 MOVE_DIAGONAL_CONST = 14;
+
+	int32 CalculateHCost(APathfindBox* AnyBox, APathfindBox* DestinationBox);
+	int32 CalculateGCost(APathfindBox* AnyBox, APathfindBox* DestinationBox);
+	TArray<APathfindBox*> GetPathfindBoxNeighbours(APathfindBox* AnyBox);
+	TArray<APathfindBox*> GetFinalPathToDestination(APathfindBox* DestinationBox);
+
 };

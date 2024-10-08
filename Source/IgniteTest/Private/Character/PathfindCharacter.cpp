@@ -4,6 +4,8 @@
 #include "Character/PathfindCharacter.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "DrawDebugHelpers.h"
+#include "Pathfind/PathfindBox.h"
 
 // Sets default values
 APathfindCharacter::APathfindCharacter()
@@ -78,12 +80,14 @@ void APathfindCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 }
 
-void APathfindCharacter::MoveCharacterToPosition(FVector Position)
+void APathfindCharacter::MoveCharacterToPathfindBox(APathfindBox* DestinationBox)
 {
-	if (Position != Destination)
+	if (DestinationBox != CurrentLocatedPathfindBox)
 	{
-		Destination = Position;
+		//DrawDebugSphere(GetWorld(), DestinationBox->GetActorLocation(), 25.f, 12, FColor::Blue, false, 1.f);
+		Destination = DestinationBox->GetActorLocation();
 		bReachedDestination = false;
+		CurrentLocatedPathfindBox = DestinationBox;
 	}
 }
 

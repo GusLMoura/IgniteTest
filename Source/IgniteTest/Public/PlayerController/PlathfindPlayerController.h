@@ -21,11 +21,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* SelectDestinationPathfindBox;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* DebugDestinationPathfindBox;
+
 protected:
 	virtual void SetupInputComponent() override;
 	virtual void BeginPlay() override;
 
 private:
 	void OnLeftMouseButtonClicked();
-	
+	void OnRightMouseButtonClicked();
 };

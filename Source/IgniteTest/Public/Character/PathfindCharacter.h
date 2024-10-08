@@ -23,17 +23,13 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float Speed = 300.f;
 
-	FVector CurrentLocation;
-	FVector Destination;
-	bool bReachedDestination = true;
-
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	void MoveCharacterToPosition(FVector Position);
+	void MoveCharacterToPathfindBox(class APathfindBox* DestinationBox);
 
 private:
 	/** Mesh */
@@ -47,4 +43,13 @@ private:
 	/** Camera boom positioning the camera above the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
+
+	FVector CurrentLocation;
+	FVector Destination;
+	bool bReachedDestination = true;
+	APathfindBox* CurrentLocatedPathfindBox;
+
+public:
+	FORCEINLINE APathfindBox* GetCurrentLocatedPathfindBox() const { return CurrentLocatedPathfindBox; }
+	FORCEINLINE void SetCurrentLocatedPathfindBox(APathfindBox* NewLocatedPathfindBox) { CurrentLocatedPathfindBox = NewLocatedPathfindBox; }
 };
