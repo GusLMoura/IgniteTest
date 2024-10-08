@@ -30,6 +30,8 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	void MoveCharacterToPathfindBox(class APathfindBox* DestinationBox);
+	void StartMoveCharacterThroughPath(TArray<APathfindBox*> Path);
+	void VerifyPathIsEndedOrKeepMoving();
 
 private:
 	/** Mesh */
@@ -48,6 +50,9 @@ private:
 	FVector Destination;
 	bool bReachedDestination = true;
 	APathfindBox* CurrentLocatedPathfindBox;
+	TArray<APathfindBox*> PathToMove;
+	bool bIsMoving = false;
+	int32 CurrentPathIndex = 0;
 
 public:
 	FORCEINLINE APathfindBox* GetCurrentLocatedPathfindBox() const { return CurrentLocatedPathfindBox; }

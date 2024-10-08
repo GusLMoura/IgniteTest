@@ -23,6 +23,8 @@ void APathfindGrid::BeginPlay()
 
 	InitializePathfindBoxesPenaltyTMap();
 
+	InitializePathfindBoxesTypesLocation();
+
 	SetGridOriginAndInclination();
 
 	CreateGrid();
@@ -36,6 +38,15 @@ void APathfindGrid::InitializePathfindBoxesPenaltyTMap()
 	TypesOfPathFindBoxPenalty.Add(EPathfindBoxType::EPBT_Sand, 1.5f);
 	TypesOfPathFindBoxPenalty.Add(EPathfindBoxType::EPBT_Mud, 2.f);
 }
+
+void APathfindGrid::InitializePathfindBoxesTypesLocation()
+{
+	UnWalkableBoxes.Add(FVector2D(0,0));
+	UnWalkableBoxes.Add(FVector2D(0,1));
+	UnWalkableBoxes.Add(FVector2D(1,1));
+}
+
+
 
 void APathfindGrid::SetGridOriginAndInclination()
 {
@@ -75,9 +86,43 @@ void APathfindGrid::CreateGrid()
 				NewPathfindBox->SetPosX(i);
 				NewPathfindBox->SetPosY(j);
 				Boxes[i][j] = NewPathfindBox;
+				SetPathFindBoxType(NewPathfindBox);
+				NewPathfindBox->SetBoxMaterialAccordingToType();
 			}
 		}
 	}
+}
+
+void APathfindGrid::SetPathFindBoxType(APathfindBox* Box)
+{
+	for (auto Element : UnWalkableBoxes)
+	{
+		if (Box->GetPosX() == (int32)Element.X && Box->GetPosY() == (int32)Element.Y)
+		{
+			Box->SetPathfindBoxType(EPathfindBoxType::EPBT_NotWalkable);
+			return;
+		}
+	}
+
+	for (auto Element : SandBoxes)
+	{
+		if (Box->GetPosX() == (int32)Element.X && Box->GetPosY() == (int32)Element.Y)
+		{
+			Box->SetPathfindBoxType(EPathfindBoxType::EPBT_Sand);
+			return;
+		}
+	}
+
+	for (auto Element : MudBoxes)
+	{
+		if (Box->GetPosX() == (int32)Element.X && Box->GetPosY() == (int32)Element.Y)
+		{
+			Box->SetPathfindBoxType(EPathfindBoxType::EPBT_Mud);
+			return;
+		}
+	}
+
+	Box->SetPathfindBoxType(EPathfindBoxType::EPBT_Grass);
 }
 
 APathfindBox* APathfindGrid::GetPlathfindBoxAtPosition(int32 PositionX, int32 PositionY)
@@ -121,7 +166,7 @@ TArray<APathfindBox*> APathfindGrid::AStarFindPathToDestination(APathfindBox* St
 
 	NotVerifiedBoxesArray.Add(StartBox);
 
-	//Clear all Pathfind Map
+	//Reset all Pathfind Map
 	for (int32 i = 0; i < SizeX; i++)
 	{
 		for (int32 j = 0; j < SizeY; j++)
@@ -133,6 +178,7 @@ TArray<APathfindBox*> APathfindGrid::AStarFindPathToDestination(APathfindBox* St
 		}
 	}
 
+	//Set Origin Box Values
 	StartBox->SetGCost(0);
 	StartBox->SetHCost(CalculateHCost(StartBox, DestinationBox));
 	StartBox->CalculateFCost();
@@ -164,9 +210,16 @@ TArray<APathfindBox*> APathfindGrid::AStarFindPathToDestination(APathfindBox* St
 		NotVerifiedBoxesArray.Remove(CurrentBox);
 		VerifiedBoxesArray.Add(CurrentBox);
 
+		//Verify Neighbours
 		for (auto Neighbour : GetPathfindBoxNeighbours(CurrentBox))
 		{
+			//Ignore Verified and Not Walkable neighbours
 			if (VerifiedBoxesArray.Contains(Neighbour)) continue;
+			if (Neighbour->GetPathfindBoxType() == EPathfindBoxType::EPBT_NotWalkable)
+			{
+				VerifiedBoxesArray.Add(Neighbour);
+				continue;
+			}
 
 			int32 CompareGCost = CurrentBox->GetGCost() + CalculateGCost(CurrentBox, Neighbour);
 			
@@ -265,11 +318,11 @@ TArray<APathfindBox*> APathfindGrid::GetFinalPathToDestination(APathfindBox* Des
 	return Path;
 }
 
-void APathfindGrid::MoveCharacterToPathfindBox(APathfindBox* DestinationBox)
+void APathfindGrid::GeneratePathfindAndMoveCharacterToDestinationBox(APathfindBox* DestinationBox)
 {
 	if (Character)
 	{
-		Character->MoveCharacterToPathfindBox(DestinationBox);
+		Character->StartMoveCharacterThroughPath(AStarFindPathToDestination(Character->GetCurrentLocatedPathfindBox(), DestinationBox));
 	}
 }
 

@@ -45,13 +45,14 @@ void APlathfindPlayerController::OnLeftMouseButtonClicked()
 	{
 		FHitResult HitResult;
 		FCollisionQueryParams TraceParams;
-		GetWorld()->LineTraceSingleByChannel(HitResult, WorldLocation, WorldLocation + WorldDirection * 1000.f, ECC_Visibility, TraceParams);
+		GetWorld()->LineTraceSingleByChannel(HitResult, WorldLocation, WorldLocation + WorldDirection * 5000.f, ECC_Visibility, TraceParams);
 		if (HitResult.GetActor())
 		{
 			APathfindBox* ClickedPathfindBox = Cast<APathfindBox>(HitResult.GetActor());
-			if (ClickedPathfindBox)
+			//Dont Move to Not Walkable Boxes
+			if (ClickedPathfindBox && ClickedPathfindBox->GetPathfindBoxType() != EPathfindBoxType::EPBT_NotWalkable)
 			{
-				ClickedPathfindBox->MoveCharacterToThisBox();
+				ClickedPathfindBox->GeneratePathfindToThisBox();
 			}
 		}
 	}
@@ -65,11 +66,11 @@ void APlathfindPlayerController::OnRightMouseButtonClicked()
 	{
 		FHitResult HitResult;
 		FCollisionQueryParams TraceParams;
-		GetWorld()->LineTraceSingleByChannel(HitResult, WorldLocation, WorldLocation + WorldDirection * 1000.f, ECC_Visibility, TraceParams);
+		GetWorld()->LineTraceSingleByChannel(HitResult, WorldLocation, WorldLocation + WorldDirection * 5000.f, ECC_Visibility, TraceParams);
 		if (HitResult.GetActor())
 		{
 			APathfindBox* ClickedPathfindBox = Cast<APathfindBox>(HitResult.GetActor());
-			if (ClickedPathfindBox)
+			if (ClickedPathfindBox && ClickedPathfindBox->GetPathfindBoxType() != EPathfindBoxType::EPBT_NotWalkable)
 			{
 				ClickedPathfindBox->DebugPathfindToThisBox();
 			}

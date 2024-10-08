@@ -32,7 +32,7 @@ public:
 	int32 SizeX = 20;
 
 	UPROPERTY(EditAnywhere, Category = "Grid Properties")
-	int32 SizeY = 10;
+	int32 SizeY = 9;
 
 	UPROPERTY(EditAnywhere, Category = "Grid Properties")
 	FVector GridOrigin = FVector(0.f, 0.f, 0.f);
@@ -49,21 +49,25 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Grid Properties")
 	FVector2D CharacterInitialBox = FVector2D(0.f, 4.f);
 
-	void MoveCharacterToPathfindBox(APathfindBox* DestinationBox);
+	void GeneratePathfindAndMoveCharacterToDestinationBox(APathfindBox* DestinationBox);
 
 	APathfindBox* GetPlathfindBoxAtPosition(int32 PositionX, int32 PositionY);
 
 	TArray<APathfindBox*> AStarFindPathToDestination(APathfindBox* StartBox, APathfindBox* DestinationBox);
 
-	
-
 private:
 	TArray<TArray<APathfindBox*>> Boxes;
 	TMap<EPathfindBoxType, float> TypesOfPathFindBoxPenalty;
 	
+	TArray<FVector2D> UnWalkableBoxes;
+	TArray<FVector2D> SandBoxes;
+	TArray<FVector2D> MudBoxes;
+
 	void InitializePathfindBoxesPenaltyTMap();
+	void InitializePathfindBoxesTypesLocation();
 	void SetGridOriginAndInclination();
 	void CreateGrid();
+	void SetPathFindBoxType(APathfindBox* Box);
 	void CreateCharacter();
 
 	const int32 MOVE_STRAIGHT_CONST = 10;

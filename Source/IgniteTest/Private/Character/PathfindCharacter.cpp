@@ -55,7 +55,7 @@ void APathfindCharacter::Tick(float DeltaTime)
 		{
 			FVector DestinationVector = Destination - CurrentLocation;
 			FVector NewLocation;
-			if (DestinationVector.Length() <= 1.f)
+			if (DestinationVector.Length() <= 2.f)
 			{
 				NewLocation = Destination;
 			}
@@ -69,6 +69,8 @@ void APathfindCharacter::Tick(float DeltaTime)
 		else
 		{
 			bReachedDestination = true;
+			CurrentLocatedPathfindBox = PathToMove[CurrentPathIndex];
+			VerifyPathIsEndedOrKeepMoving();
 		}
 	}
 }
@@ -84,10 +86,36 @@ void APathfindCharacter::MoveCharacterToPathfindBox(APathfindBox* DestinationBox
 {
 	if (DestinationBox != CurrentLocatedPathfindBox)
 	{
-		//DrawDebugSphere(GetWorld(), DestinationBox->GetActorLocation(), 25.f, 12, FColor::Blue, false, 1.f);
 		Destination = DestinationBox->GetActorLocation();
 		bReachedDestination = false;
-		CurrentLocatedPathfindBox = DestinationBox;
+		
+	}
+}
+
+void APathfindCharacter::StartMoveCharacterThroughPath(TArray<APathfindBox*> Path)
+{
+	if (!bIsMoving)
+	{
+		bIsMoving = true;
+		PathToMove = Path;
+		CurrentPathIndex = 0;
+		Destination = PathToMove[0]->GetActorLocation();
+		bReachedDestination = false;
+	}
+}
+
+void APathfindCharacter::VerifyPathIsEndedOrKeepMoving()
+{
+	CurrentPathIndex++;
+	if (PathToMove.IsValidIndex(CurrentPathIndex))
+	{
+		Destination = PathToMove[CurrentPathIndex]->GetActorLocation();
+		bReachedDestination = false;
+	}
+	else
+	{
+		bIsMoving = false;
+		PathToMove.Empty();
 	}
 }
 

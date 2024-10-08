@@ -12,6 +12,9 @@ APathfindBox::APathfindBox()
 {
 	BoxCollider = CreateDefaultSubobject<UBoxComponent>(TEXT("Collider"));
 	SetRootComponent(BoxCollider);
+
+	BoxMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BoxMesh"));
+	BoxMesh->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
@@ -20,16 +23,64 @@ void APathfindBox::BeginPlay()
 	Super::BeginPlay();
 }
 
+void APathfindBox::SetBoxMaterialAccordingToType()
+{
+	if (BoxMesh)
+	{
+		UMaterial* MaterialToSet = nullptr;
+
+		switch (PathfindBoxType)
+		{
+			case EPathfindBoxType::EPBT_Grass:
+			{
+				if (GrassBoxMaterial)
+				{
+					MaterialToSet = GrassBoxMaterial;
+				}
+			} break;
+			
+			case EPathfindBoxType::EPBT_Sand:
+			{
+				if (SandBoxMaterial)
+				{
+					MaterialToSet = SandBoxMaterial;
+				}
+			} break;
+
+			case EPathfindBoxType::EPBT_Mud:
+			{
+				if (MudBoxMaterial)
+				{
+					MaterialToSet = MudBoxMaterial;
+				}
+			} break;
+
+			case EPathfindBoxType::EPBT_NotWalkable:
+			{
+				if (UnwalkableBoxMaterial)
+				{
+					MaterialToSet = UnwalkableBoxMaterial;
+				}
+			} break;
+		}
+
+		if (MaterialToSet)
+		{
+			BoxMesh->SetMaterial(0, MaterialToSet);
+		}
+	}
+}
+
 void APathfindBox::CalculateFCost()
 {
 	FCost = GCost + HCost;
 }
 
-void APathfindBox::MoveCharacterToThisBox()
+void APathfindBox::GeneratePathfindToThisBox()
 {
 	if (MyGrid)
 	{
-		MyGrid->MoveCharacterToPathfindBox(this);
+		MyGrid->GeneratePathfindAndMoveCharacterToDestinationBox(this);
 	}
 }
 
@@ -37,14 +88,15 @@ void APathfindBox::DebugPathfindToThisBox()
 {
 	if (MyGrid)
 	{
-		DrawDebugSphere(GetWorld(), this->GetActorLocation(), 25.f, 12, FColor::Blue, false, 1.f);
+		
 
 		TArray<APathfindBox*> Path = MyGrid->AStarFindPathToDestination(MyGrid->Character->GetCurrentLocatedPathfindBox(), this);
 		if (Path.Num() > 0)
 		{
-			for (auto Element : Path)
+			for (int i = 0; i < Path.Num() - 1; i++)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Nome: %s"), *Element->GetFullName());
+				DrawDebugSphere(GetWorld(), this->GetActorLocation(), 25.f, 12, FColor::Blue, false, 3.f);
+				DrawDebugLine(GetWorld(), Path[i]->GetActorLocation(), Path[i + 1]->GetActorLocation(), FColor::Blue, false, 3.f, 12, 10.f);
 			}
 		}
 	}
