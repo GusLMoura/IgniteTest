@@ -207,7 +207,7 @@ void APathfindGrid::CreateCharacter()
 		{
 			FActorSpawnParameters SpawnParameters;
 			SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-			Character = GetWorld()->SpawnActor<APathfindCharacter>(CharacterClass, InitialPathfindBox->GetActorLocation(), InitialPathfindBox->GetActorRotation(), SpawnParameters);
+			Character = GetWorld()->SpawnActor<APathfindCharacter>(CharacterClass, InitialPathfindBox->GetActorLocation(), this->GetActorRotation(), SpawnParameters);
 			if (Character)
 			{
 				Character->SetCurrentLocatedPathfindBox(InitialPathfindBox);

@@ -32,11 +32,16 @@ public:
 	void MoveCharacterToPathfindBox(class APathfindBox* DestinationBox);
 	void StartMoveCharacterThroughPath(TArray<APathfindBox*> Path);
 	void VerifyPathIsEndedOrKeepMoving();
+	void RotateCharacterToDestinationDirection(FVector DestinationPosition);
+	FRotator CombineRotators(FRotator RotA, FRotator RotB);
 
 private:
-	/** Mesh */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	UStaticMeshComponent* Mesh;
+	class USceneComponent* NewRootComponent;
+
+	/** Skeletal Mesh */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	class USkeletalMeshComponent* SkeletalMesh;
 
 	/** Top down camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))

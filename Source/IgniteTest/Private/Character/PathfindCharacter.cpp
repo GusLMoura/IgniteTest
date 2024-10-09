@@ -6,6 +6,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Pathfind/PathfindBox.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 APathfindCharacter::APathfindCharacter()
@@ -18,9 +20,13 @@ APathfindCharacter::APathfindCharacter()
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 
+	//Create Root Component
+	NewRootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("NewRoot"));
+	SetRootComponent(NewRootComponent);
+
 	//Create Mesh
-	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	SetRootComponent(Mesh);
+	SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
+	SkeletalMesh->SetupAttachment(RootComponent);
 
 	// Create a camera boom...
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -51,13 +57,17 @@ void APathfindCharacter::Tick(float DeltaTime)
 	if (!bReachedDestination)
 	{
 		CurrentLocation = this->GetActorLocation();
+		bool RotationCheckReachedDestination = false;
+
 		if (CurrentLocation != Destination)
 		{
+			
 			FVector DestinationVector = Destination - CurrentLocation;
 			FVector NewLocation;
 			if (DestinationVector.Length() <= 2.f)
 			{
 				NewLocation = Destination;
+				RotationCheckReachedDestination = true;
 			}
 			else
 			{
@@ -65,10 +75,13 @@ void APathfindCharacter::Tick(float DeltaTime)
 			}
 			 
 			SetActorLocation(NewLocation);
+
+			if(!RotationCheckReachedDestination) RotateCharacterToDestinationDirection(Destination);
 		}
 		else
 		{
 			bReachedDestination = true;
+			RotationCheckReachedDestination = false;
 			CurrentLocatedPathfindBox = PathToMove[CurrentPathIndex];
 			VerifyPathIsEndedOrKeepMoving();
 		}
@@ -119,3 +132,18 @@ void APathfindCharacter::VerifyPathIsEndedOrKeepMoving()
 	}
 }
 
+void APathfindCharacter::RotateCharacterToDestinationDirection(FVector DestinationPosition)
+{
+	FRotator WorldLookAtRotation = (DestinationPosition - this->GetActorLocation()).Rotation();
+	FRotator LocalLookAtRotation = CombineRotators(WorldLookAtRotation, this->GetActorRotation() * -1);
+
+	SkeletalMesh->SetRelativeRotation(FRotator(SkeletalMesh->GetRelativeRotation().Pitch, LocalLookAtRotation.Yaw -90.f, SkeletalMesh->GetRelativeRotation().Roll));
+}
+
+FRotator APathfindCharacter::CombineRotators(FRotator RotA, FRotator RotB)
+{
+	FQuat AQuat = FQuat(RotA);
+	FQuat BQuat = FQuat(RotB);
+
+	return FRotator(BQuat * AQuat);
+}
