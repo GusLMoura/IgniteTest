@@ -32,7 +32,7 @@ APathfindCharacter::APathfindCharacter()
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->SetUsingAbsoluteRotation(true); // Don't want arm to rotate when character does
-	CameraBoom->TargetArmLength = 800.f;
+	CameraBoom->TargetArmLength = CameraDefaultZoom;
 	CameraBoom->SetRelativeRotation(FRotator(-60.f, 0.f, 0.f));
 	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
 
@@ -53,6 +53,7 @@ void APathfindCharacter::BeginPlay()
 		//const FRotator Rotation = CameraBoom->GetRelativeRotation();
 		CameraTargetRotation = CameraBoom->GetRelativeRotation();
 		CameraDefaultRotation = CameraTargetRotation;
+		CameraTargetZoom = CameraDefaultZoom;
 	}
 }
 
@@ -61,6 +62,7 @@ void APathfindCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//Character Movement
 	if (!bReachedDestination)
 	{
 		CurrentLocation = this->GetActorLocation();
@@ -94,8 +96,13 @@ void APathfindCharacter::Tick(float DeltaTime)
 		}
 	}
 
+	//Camera Rotation
 	const FRotator InterpolatedRotation = UKismetMathLibrary::RInterpTo(CameraBoom->GetRelativeRotation(), CameraTargetRotation, DeltaTime, CameraRotateSpeed);
 	CameraBoom->SetRelativeRotation(InterpolatedRotation);
+
+	//Camera Zoom
+	const float InterpolatedZoom = UKismetMathLibrary::FInterpTo(CameraBoom->TargetArmLength, CameraTargetZoom, DeltaTime, CameraZoomSpeed);
+	CameraBoom->TargetArmLength = InterpolatedZoom;
 }
 
 // Called to bind functionality to input
@@ -162,10 +169,23 @@ void APathfindCharacter::RotateCameraHorizontal(float AxisValue)
 {
 	if (AxisValue == 0.f) return;
 
-	CameraTargetRotation = UKismetMathLibrary::ComposeRotators(CameraTargetRotation, FRotator(0.f, AxisValue * CameraSensibility, 0.f));
+	CameraTargetRotation = UKismetMathLibrary::ComposeRotators(CameraTargetRotation, FRotator(0.f, AxisValue * CameraRotationSensibility, 0.f));
 }
 
 void APathfindCharacter::RestoreCameraRotation()
 {
 	CameraTargetRotation = CameraDefaultRotation;
+}
+
+void APathfindCharacter::Zoom(float AxisValue)
+{
+	if (AxisValue == 0.f) return;
+
+	const float Zoom = AxisValue * CameraZoomSensibility;
+	CameraTargetZoom = FMath::Clamp(Zoom + CameraTargetZoom, CameraMinimunZoom, CameraMaximumZoom);
+}
+
+void APathfindCharacter::RestoreZoomToDefault()
+{
+	CameraTargetZoom = CameraDefaultZoom;
 }

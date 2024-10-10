@@ -27,7 +27,22 @@ public:
 	float CameraRotateSpeed = 10.f;
 
 	UPROPERTY(EditAnywhere, Category = "Camera")
-	float CameraSensibility = 5.f;
+	float CameraRotationSensibility = 5.f;
+
+	UPROPERTY(EditAnywhere, Category = "Camera")
+	float CameraZoomSpeed = 2.f;
+
+	UPROPERTY(EditAnywhere, Category = "Camera")
+	float CameraZoomSensibility = 100.f;
+
+	UPROPERTY(EditAnywhere, Category = "Camera")
+	float CameraMinimunZoom = 100.f;
+
+	UPROPERTY(EditAnywhere, Category = "Camera")
+	float CameraMaximumZoom = 4000.f;
+
+	UPROPERTY(VisibleAnywhere, Category = "Camera")
+	float CameraDefaultZoom = 800.f;
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -42,6 +57,8 @@ public:
 	FRotator CombineRotators(FRotator RotA, FRotator RotB);
 	void RotateCameraHorizontal(float AxisValue);
 	void RestoreCameraRotation();
+	void Zoom(float AxisValue);
+	void RestoreZoomToDefault();
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -69,6 +86,7 @@ private:
 
 	FRotator CameraTargetRotation;
 	FRotator CameraDefaultRotation;
+	float CameraTargetZoom;
 
 public:
 	FORCEINLINE APathfindBox* GetCurrentLocatedPathfindBox() const { return CurrentLocatedPathfindBox; }

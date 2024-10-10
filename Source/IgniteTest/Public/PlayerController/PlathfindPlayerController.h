@@ -30,6 +30,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* CameraMove;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* ChangeZoom;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* RestoreZoom;
+
 protected:
 	virtual void SetupInputComponent() override;
 	virtual void BeginPlay() override;
@@ -43,4 +49,6 @@ private:
 	void OnEnableCameraMovementButtonPressed();
 	void OnEnableCameraMovementButtonReleased();
 	void OnThumbMouseButtonHolded(const struct FInputActionValue& Value);
+	void OnMouseScroll(const struct FInputActionValue& Value);
+	void OnButtonRestoreZoomPressed();
 };

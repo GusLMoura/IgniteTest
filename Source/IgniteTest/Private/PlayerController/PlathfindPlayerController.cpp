@@ -34,6 +34,16 @@ void APlathfindPlayerController::SetupInputComponent()
 		{
 			EnhancedInputComponent->BindAction(CameraMove, ETriggerEvent::Triggered, this, &APlathfindPlayerController::OnThumbMouseButtonHolded);
 		}
+
+		if (ChangeZoom)
+		{
+			EnhancedInputComponent->BindAction(ChangeZoom, ETriggerEvent::Triggered, this, &APlathfindPlayerController::OnMouseScroll);
+		}
+
+		if (RestoreZoom)
+		{
+			EnhancedInputComponent->BindAction(RestoreZoom, ETriggerEvent::Triggered, this, &APlathfindPlayerController::OnButtonRestoreZoomPressed);
+		}
 	}
 }
 
@@ -116,5 +126,27 @@ void APlathfindPlayerController::OnThumbMouseButtonHolded(const FInputActionValu
 	if (PathfindCharacter)
 	{
 		PathfindCharacter->RotateCameraHorizontal(Value.Get<float>());
+	}
+}
+
+void APlathfindPlayerController::OnMouseScroll(const FInputActionValue& Value)
+{
+	if (Value.Get<float>() == 0.f) return;
+
+	PathfindCharacter = PathfindCharacter == nullptr ? Cast<APathfindCharacter>(GetPawn()) : PathfindCharacter;
+
+	if (PathfindCharacter)
+	{
+		PathfindCharacter->Zoom(Value.Get<float>());
+	}
+}
+
+void APlathfindPlayerController::OnButtonRestoreZoomPressed()
+{
+	PathfindCharacter = PathfindCharacter == nullptr ? Cast<APathfindCharacter>(GetPawn()) : PathfindCharacter;
+
+	if (PathfindCharacter)
+	{
+		PathfindCharacter->RestoreZoomToDefault();
 	}
 }
