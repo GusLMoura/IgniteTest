@@ -13,4 +13,20 @@ void UPathfindCharacterAnimInstance::NativeInitializeAnimation()
 void UPathfindCharacterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 {
 	Super::NativeUpdateAnimation(DeltaTime);
+
+	if (!PathfindCharacter)
+	{
+		PathfindCharacter = Cast<APathfindCharacter>(TryGetPawnOwner());
+	}
+
+	if (!PathfindCharacter) return;
+
+	if (!PathfindCharacter->GetReachedDestination())
+	{
+		bIsWalking = true;
+	}
+	else
+	{
+		bIsWalking = false;
+	}
 }

@@ -73,4 +73,5 @@ private:
 public:
 	FORCEINLINE APathfindBox* GetCurrentLocatedPathfindBox() const { return CurrentLocatedPathfindBox; }
 	FORCEINLINE void SetCurrentLocatedPathfindBox(APathfindBox* NewLocatedPathfindBox) { CurrentLocatedPathfindBox = NewLocatedPathfindBox; }
+	FORCEINLINE bool GetReachedDestination() const { return bReachedDestination; }
 };

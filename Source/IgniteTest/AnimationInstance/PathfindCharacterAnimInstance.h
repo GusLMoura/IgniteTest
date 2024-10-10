@@ -20,4 +20,7 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = Character)
 	class APathfindCharacter* PathfindCharacter;
+
+	UPROPERTY(BlueprintReadOnly, Category = Character)
+	bool bIsWalking = false;
 };
