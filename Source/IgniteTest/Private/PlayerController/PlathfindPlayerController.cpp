@@ -6,6 +6,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Pathfind/PathfindBox.h"
+#include "Character/PathfindCharacter.h"
 
 void APlathfindPlayerController::SetupInputComponent()
 {
@@ -21,6 +22,17 @@ void APlathfindPlayerController::SetupInputComponent()
 		if (DebugDestinationPathfindBox)
 		{
 			EnhancedInputComponent->BindAction(DebugDestinationPathfindBox, ETriggerEvent::Started, this, &APlathfindPlayerController::OnRightMouseButtonClicked);
+		}
+
+		if (EnableCameraMovement)
+		{
+			EnhancedInputComponent->BindAction(EnableCameraMovement, ETriggerEvent::Started, this, &APlathfindPlayerController::OnEnableCameraMovementButtonPressed);
+			EnhancedInputComponent->BindAction(EnableCameraMovement, ETriggerEvent::Completed, this, &APlathfindPlayerController::OnEnableCameraMovementButtonReleased);
+		}
+
+		if (CameraMove)
+		{
+			EnhancedInputComponent->BindAction(CameraMove, ETriggerEvent::Triggered, this, &APlathfindPlayerController::OnThumbMouseButtonHolded);
 		}
 	}
 }
@@ -75,5 +87,34 @@ void APlathfindPlayerController::OnRightMouseButtonClicked()
 				ClickedPathfindBox->DebugPathfindToThisBox();
 			}
 		}
+	}
+}
+
+void APlathfindPlayerController::OnEnableCameraMovementButtonPressed()
+{
+	bCameraCanRotate = true;
+}
+
+void APlathfindPlayerController::OnEnableCameraMovementButtonReleased()
+{
+	bCameraCanRotate = false;
+
+	PathfindCharacter = PathfindCharacter == nullptr ? Cast<APathfindCharacter>(GetPawn()) : PathfindCharacter;
+	
+	if (PathfindCharacter)
+	{
+		PathfindCharacter->RestoreCameraRotation();
+	}
+}
+
+void APlathfindPlayerController::OnThumbMouseButtonHolded(const FInputActionValue& Value)
+{
+	if (!bCameraCanRotate || Value.Get<float>() == 0.f) return;
+
+	PathfindCharacter = PathfindCharacter == nullptr ? Cast<APathfindCharacter>(GetPawn()) : PathfindCharacter;
+
+	if (PathfindCharacter)
+	{
+		PathfindCharacter->RotateCameraHorizontal(Value.Get<float>());
 	}
 }

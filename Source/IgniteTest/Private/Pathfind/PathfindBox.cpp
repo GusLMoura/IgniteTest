@@ -88,8 +88,6 @@ void APathfindBox::DebugPathfindToThisBox()
 {
 	if (MyGrid)
 	{
-		
-
 		TArray<APathfindBox*> Path = MyGrid->AStarFindPathToDestination(MyGrid->Character->GetCurrentLocatedPathfindBox(), this);
 		if (Path.Num() > 0)
 		{

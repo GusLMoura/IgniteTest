@@ -46,7 +46,14 @@ APathfindCharacter::APathfindCharacter()
 void APathfindCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	//Get Current Spring Arm Rotation for Target Rotation as we change it
+	if (CameraBoom)
+	{
+		//const FRotator Rotation = CameraBoom->GetRelativeRotation();
+		CameraTargetRotation = CameraBoom->GetRelativeRotation();
+		CameraDefaultRotation = CameraTargetRotation;
+	}
 }
 
 // Called every frame
@@ -86,6 +93,9 @@ void APathfindCharacter::Tick(float DeltaTime)
 			VerifyPathIsEndedOrKeepMoving();
 		}
 	}
+
+	const FRotator InterpolatedRotation = UKismetMathLibrary::RInterpTo(CameraBoom->GetRelativeRotation(), CameraTargetRotation, DeltaTime, CameraRotateSpeed);
+	CameraBoom->SetRelativeRotation(InterpolatedRotation);
 }
 
 // Called to bind functionality to input
@@ -146,4 +156,16 @@ FRotator APathfindCharacter::CombineRotators(FRotator RotA, FRotator RotB)
 	FQuat BQuat = FQuat(RotB);
 
 	return FRotator(BQuat * AQuat);
+}
+
+void APathfindCharacter::RotateCameraHorizontal(float AxisValue)
+{
+	if (AxisValue == 0.f) return;
+
+	CameraTargetRotation = UKismetMathLibrary::ComposeRotators(CameraTargetRotation, FRotator(0.f, AxisValue * CameraSensibility, 0.f));
+}
+
+void APathfindCharacter::RestoreCameraRotation()
+{
+	CameraTargetRotation = CameraDefaultRotation;
 }

@@ -23,6 +23,12 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float Speed = 300.f;
 
+	UPROPERTY(EditAnywhere, Category = "Camera")
+	float CameraRotateSpeed = 10.f;
+
+	UPROPERTY(EditAnywhere, Category = "Camera")
+	float CameraSensibility = 5.f;
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -34,6 +40,8 @@ public:
 	void VerifyPathIsEndedOrKeepMoving();
 	void RotateCharacterToDestinationDirection(FVector DestinationPosition);
 	FRotator CombineRotators(FRotator RotA, FRotator RotB);
+	void RotateCameraHorizontal(float AxisValue);
+	void RestoreCameraRotation();
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -58,6 +66,9 @@ private:
 	TArray<APathfindBox*> PathToMove;
 	bool bIsMoving = false;
 	int32 CurrentPathIndex = 0;
+
+	FRotator CameraTargetRotation;
+	FRotator CameraDefaultRotation;
 
 public:
 	FORCEINLINE APathfindBox* GetCurrentLocatedPathfindBox() const { return CurrentLocatedPathfindBox; }

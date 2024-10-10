@@ -24,11 +24,23 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	class UInputAction* DebugDestinationPathfindBox;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* EnableCameraMovement;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	class UInputAction* CameraMove;
+
 protected:
 	virtual void SetupInputComponent() override;
 	virtual void BeginPlay() override;
 
 private:
+	class APathfindCharacter* PathfindCharacter;
+	bool bCameraCanRotate;
+
 	void OnLeftMouseButtonClicked();
 	void OnRightMouseButtonClicked();
+	void OnEnableCameraMovementButtonPressed();
+	void OnEnableCameraMovementButtonReleased();
+	void OnThumbMouseButtonHolded(const struct FInputActionValue& Value);
 };
